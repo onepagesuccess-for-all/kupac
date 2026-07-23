@@ -1,9 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="sr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Profil željene nekretnine</title>
+<meta property="og:title" content="Profil željene nekretnine">
+<meta property="og:description" content="Molim Vas popunite za 2–3 minuta — pomoći ćete nam da Vam brzo pronađemo odgovarajući stan!">
+<meta property="og:image" content="https://ONDESITE.KOJIKORISTIS/preview.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -331,7 +337,7 @@
 
 <header>
   <h1>Profil željene nekretnine</h1>
-  <p>Popunite za 2–3 minuta — pomoći će nam da vam brzo pronađemo pravi stan</p>
+  <p>Molim Vas popunite za 2–3 minuta — pomoći ćete nam da Vam brzo pronađemo odgovarajući stan!</p>
 </header>
 
 <div class="progress-wrap">
@@ -359,10 +365,13 @@
     <pre id="summaryText"></pre>
     <div class="modal-actions">
       <button class="btn btn-primary" id="submitBtn" onclick="sendFormSubmit()">Pošalji profil</button>
-      <button class="btn btn-secondary" onclick="sendWhatsApp()">Pošalji na WhatsApp</button>
+      <button class="btn btn-secondary" onclick="sendWhatsApp()">WhatsApp</button>
+      <button class="btn btn-secondary" onclick="sendViber()">Viber</button>
+      <button class="btn btn-secondary" onclick="sendSMS()">SMS</button>
       <button class="btn btn-secondary" onclick="copyText()">Kopiraj tekst</button>
     </div>
     <p id="sendStatus" style="font-size:0.8rem;color:#9c9890;margin-top:10px;"></p>
+    <p style="font-size:0.76rem;color:#8a8579;margin-top:4px;">Ne morate imati instaliran WhatsApp da biste poslali poruku! Za Viber je potrebna instalirana aplikacija na telefonu.</p>
   </div>
 </div>
 
@@ -394,44 +403,39 @@ const RADIUS_OPCIJE = ["Samo ovaj deo", "Okolna naselja do 500 m", "Do 1 km", "D
 /* stanje aplikacije */
 const state = {
   opstine: {},        // { "Vračar": Set(naselja) }
-  radius: null,
+  radius: new Set(),
   tip: new Set(),
   povrsinaMin: "", povrsinaMax: "",
   cenaMin: "", cenaMax: "",
-  nacinKupovine: null, kreditStatus: null,
-  uknjizenost: null,
+  nacinKupovine: new Set(), kreditStatus: new Set(),
+  uknjizenost: new Set(),
   sprat: { min: "", max: "" },
   spratPosebno: new Set(),
-  lift: null, liftMaxSprat: null,
-  terasa: null,
+  lift: new Set(), liftMaxSprat: null,
+  terasa: new Set(),
   grejanje: new Set(),
   stanje: new Set(),
   zgrada: new Set(),
   orijentacija: new Set(),
-  osvetljenost: null,
-  orijentisanost: null,
+  osvetljenost: new Set(),
+  orijentisanost: new Set(),
   parking: new Set(),
   ostave: new Set(),
-  dokumentacija: null,
+  dokumentacija: new Set(),
   sadrzaji: new Set(),
   prioriteti: new Set(),
   dodatno: "",
-  prodajeStan: null,
-  kadaKupovina: null,
-  vlasnikOglasi: null,
-  agencijskiOglasi: null,
-  odstupanjeCena: null,
-  odstupanjeKvadratura: null,
-  adaptacija: null,
-  potkrovlje: null,
-  bezTerase: null,
-  odmahUseljiv: null,
-  energetska: null,
-  ljubimci: null,
-  ulica: null,
+  prodajeStan: new Set(),
+  kadaKupovina: new Set(),
+  adaptacija: new Set(),
+  potkrovlje: new Set(),
+  bezTerase: new Set(),
+  odmahUseljiv: new Set(),
+  ljubimci: new Set(),
+  ulica: new Set(),
   minutiPrevoz: "",
   minutiSkola: "",
-  pogled: new Set(),
+  pogled2: new Set(),
   video: new Set()
 };
 
@@ -534,15 +538,14 @@ function buildLokacija(body) {
     body.appendChild(block);
   });
 
-  const label = el('label', 'field-label', 'Dodatna opcija za sve izabrane delove grada:');
+  const label = el('label', 'field-label', 'Dodatna opcija za sve izabrane delove grada (može više odjednom):');
   body.appendChild(label);
   const radiusWrap = el('div', 'radio-row');
   RADIUS_OPCIJE.forEach(opt => {
     const chip = el('div', 'radio-chip', opt);
     chip.onclick = () => {
-      radiusWrap.querySelectorAll('.radio-chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
-      state.radius = opt;
+      if (state.radius.has(opt)) { state.radius.delete(opt); chip.classList.remove('selected'); }
+      else { state.radius.add(opt); chip.classList.add('selected'); }
       updateProgress();
     };
     radiusWrap.appendChild(chip);
@@ -555,15 +558,15 @@ function buildMultiSection(body, options, setRef) {
   buildCheckList(body, options, setRef);
 }
 
-/* --- Generička sekcija sa single-select chip redom --- */
+/* --- Generička sekcija sa chip redom, višestruki izbor --- */
 function buildSingleSection(body, options, stateObj, key) {
   const wrap = el('div', 'radio-row');
+  const set = stateObj[key];
   options.forEach(opt => {
     const chip = el('div', 'radio-chip', opt);
     chip.onclick = () => {
-      wrap.querySelectorAll('.radio-chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
-      stateObj[key] = opt;
+      if (set.has(opt)) { set.delete(opt); chip.classList.remove('selected'); }
+      else { set.add(opt); chip.classList.add('selected'); }
       updateProgress();
     };
     wrap.appendChild(chip);
@@ -635,7 +638,7 @@ root.appendChild(makeSection(7, "Sprat", (body) => {
 
 root.appendChild(makeSection(8, "Lift", (body) => {
   buildSingleSection(body, ["Obavezan","Poželjan","Nije bitan"], state, "lift");
-  const label = el('label', 'field-label', 'Ako nema lift — najviši sprat koji prihvata:');
+  const label = el('label', 'field-label', 'Ako nema lifta — najviši sprat koji prihvata:');
   label.style.marginTop = "12px";
   body.appendChild(label);
   const input = el('input');
@@ -650,11 +653,11 @@ root.appendChild(makeSection(9, "Terasa", (body) => {
 }));
 
 root.appendChild(makeSection(10, "Grejanje", (body) => {
-  buildMultiSection(body, ["Centralno","CG po potrošnji","CG po kvadraturi","Gas","Etažno","Toplotna pumpa","TA peć","Inverter klima","Nije bitno"], state.grejanje);
+  buildMultiSection(body, ["Centralno","CG po potrošnji","Gas","Etažno","Toplotna pumpa","TA peć","Inverter klima","Nije bitno"], state.grejanje);
 }));
 
 root.appendChild(makeSection(11, "Stanje stana", (body) => {
-  buildMultiSection(body, ["Izvorno","Za renoviranje","Delimično renoviran","Renoviran","Luksuzno sređen","Novogradnja","Starogradnja"], state.stanje);
+  buildMultiSection(body, ["Očuvan","Za renoviranje","Delimično renoviran","Renoviran","Luksuzno sređen","Novogradnja","Starogradnja"], state.stanje);
 }));
 
 root.appendChild(makeSection(12, "Zgrada", (body) => {
@@ -689,30 +692,10 @@ root.appendChild(makeSection(19, "Sadržaji u blizini", (body) => {
   buildMultiSection(body, ["Vrtić","Škola","Dom zdravlja","Bolnica","Autobus","Tramvaj","Voz","Park","Igralište","Supermarket","Tržni centar","Pijaca","Teretana","Bazen","Šetalište","Rekreacija","Restorani","Kafići"], state.sadrzaji);
 }));
 
-root.appendChild(makeSection(20, "Šta je najvažnije (izaberite do 5)", (body) => {
-  const note = el('div', 'priority-note', 'Izaberite najviše 5 prioriteta.');
+root.appendChild(makeSection(20, "Šta je najvažnije", (body) => {
+  const note = el('div', 'priority-note', 'Izaberite koliko god želite.');
   body.appendChild(note);
-  const wrap = el('div', 'check-list');
-  PRIORITETI_LISTA.forEach(opt => {
-    const item = el('div', 'check-item');
-    item.innerHTML = `<span class="box"></span><span>⭐ ${opt}</span>`;
-    item.onclick = () => {
-      if (state.prioriteti.has(opt)) {
-        state.prioriteti.delete(opt);
-        item.classList.remove('selected');
-      } else {
-        if (state.prioriteti.size >= 5) {
-          alert('Možete izabrati najviše 5 prioriteta.');
-          return;
-        }
-        state.prioriteti.add(opt);
-        item.classList.add('selected');
-      }
-      updateProgress();
-    };
-    wrap.appendChild(item);
-  });
-  body.appendChild(wrap);
+  buildMultiSection(body, PRIORITETI_LISTA.map(p => "⭐ " + p), state.prioriteti);
 }));
 
 root.appendChild(makeSection(21, "Dodatni zahtevi", (body) => {
@@ -726,17 +709,12 @@ root.appendChild(makeSection(22, "Dodatna pitanja (opciono)", (body) => {
   const rows = [
     ["Da li prodajete svoj stan pre kupovine?", ["Da","Ne","Nije bitno"], state, "prodajeStan"],
     ["Kada planirate kupovinu?", ["Odmah","Do 30 dana","Do 3 meseca","Do 6 meseci","Nije hitno"], state, "kadaKupovina"],
-    ["Da li želite isključivo oglase vlasnika?", ["Da","Ne","Nije bitno"], state, "vlasnikOglasi"],
-    ["Da li prihvatate agencijske oglase?", ["Da","Ne"], state, "agencijskiOglasi"],
-    ["Koliko odstupanje od cene prihvatate?", ["Nijedno","+5%","+10%","Fleksibilno"], state, "odstupanjeCena"],
-    ["Koliko odstupanje od kvadrature prihvatate?", ["Nijedno","±5 m²","±10 m²","Fleksibilno"], state, "odstupanjeKvadratura"],
     ["Da li prihvatate stanove za adaptaciju?", ["Da","Ne","Svejedno"], state, "adaptacija"],
     ["Da li prihvatate potkrovlje?", ["Da","Ne","Svejedno"], state, "potkrovlje"],
     ["Da li prihvatate stan bez terase ako ispunjava sve ostalo?", ["Da","Ne"], state, "bezTerase"],
     ["Da li želite odmah useljiv stan?", ["Da","Ne","Svejedno"], state, "odmahUseljiv"],
-    ["Da li vam je važna energetska efikasnost?", ["Da","Ne","Svejedno"], state, "energetska"],
     ["Da li su kućni ljubimci bitni (dvorište/park)?", ["Da","Ne","Svejedno"], state, "ljubimci"],
-    ["Da li želite mirnu ulicu ili živ centar?", ["Mirna ulica","Živ centar","Svejedno"], state, "ulica"],
+    ["Da li želite mirnu ulicu ili bučni centar?", ["Mirna ulica","Bučni centar","Svejedno"], state, "ulica"],
     ["Da li želite pogled na park/reku/grad?", ["Da","Ne","Svejedno"], state, "pogled2"]
   ];
   rows.forEach(([q, opts, obj, key]) => {
@@ -764,7 +742,7 @@ root.appendChild(makeSection(22, "Dodatna pitanja (opciono)", (body) => {
   const label3 = el('label', 'field-label', 'Da li želite zgradu sa video-nadzorom / interfonom / recepcijom?');
   label3.style.marginTop = "12px";
   body.appendChild(label3);
-  buildMultiSection(body, ["Video-nadzor","Interfon","Recepcija","Nije bitno"], state.video);
+  buildMultiSection(body, ["Video-nadzor","Interfon","Nije bitno"], state.video);
 }));
 
 /* otvori prvu sekciju odmah */
@@ -778,24 +756,24 @@ function countAnswered() {
   if (state.tip.size > 0) answered++;
   if (state.povrsinaMin || state.povrsinaMax) answered++;
   if (state.cenaMin || state.cenaMax) answered++;
-  if (state.nacinKupovine) answered++;
-  if (state.uknjizenost) answered++;
+  if (state.nacinKupovine.size > 0) answered++;
+  if (state.uknjizenost.size > 0) answered++;
   if (state.sprat.min || state.sprat.max || state.spratPosebno.size > 0) answered++;
-  if (state.lift) answered++;
-  if (state.terasa) answered++;
+  if (state.lift.size > 0) answered++;
+  if (state.terasa.size > 0) answered++;
   if (state.grejanje.size > 0) answered++;
   if (state.stanje.size > 0) answered++;
   if (state.zgrada.size > 0) answered++;
   if (state.orijentacija.size > 0) answered++;
-  if (state.osvetljenost) answered++;
-  if (state.orijentisanost) answered++;
+  if (state.osvetljenost.size > 0) answered++;
+  if (state.orijentisanost.size > 0) answered++;
   if (state.parking.size > 0) answered++;
   if (state.ostave.size > 0) answered++;
-  if (state.dokumentacija) answered++;
+  if (state.dokumentacija.size > 0) answered++;
   if (state.sadrzaji.size > 0) answered++;
   if (state.prioriteti.size > 0) answered++;
   if (state.dodatno) answered++;
-  if (state.prodajeStan || state.kadaKupovina) answered++;
+  if (state.prodajeStan.size > 0 || state.kadaKupovina.size > 0) answered++;
   return { answered, total };
 }
 
@@ -819,48 +797,43 @@ function buildSummaryText() {
     opstineList.forEach(o => {
       lines.push(`  ${o}: ${[...state.opstine[o]].join(", ")}`);
     });
-    if (state.radius) lines.push(`  Radijus: ${state.radius}`);
+    if (state.radius.size) lines.push(`  Radijus: ${[...state.radius].join(", ")}`);
     lines.push("");
   }
 
   if (state.tip.size) lines.push(`🏠 Tip: ${[...state.tip].join(", ")}`);
   if (state.povrsinaMin || state.povrsinaMax) lines.push(`📐 Površina: ${state.povrsinaMin || "?"} – ${state.povrsinaMax || "?"} m²`);
   if (state.cenaMin || state.cenaMax) lines.push(`💰 Cena: ${state.cenaMin || "?"} – ${state.cenaMax || "?"} €`);
-  if (state.nacinKupovine) lines.push(`💳 Način kupovine: ${state.nacinKupovine}${state.kreditStatus ? " (" + state.kreditStatus + ")" : ""}`);
-  if (state.uknjizenost) lines.push(`📄 Uknjiženost: ${state.uknjizenost}`);
+  if (state.nacinKupovine.size) lines.push(`💳 Način kupovine: ${[...state.nacinKupovine].join(", ")}${state.kreditStatus.size ? " (" + [...state.kreditStatus].join(", ") + ")" : ""}`);
+  if (state.uknjizenost.size) lines.push(`📄 Uknjiženost: ${[...state.uknjizenost].join(", ")}`);
   if (state.sprat.min || state.sprat.max) lines.push(`🏢 Sprat: ${state.sprat.min || "?"} – ${state.sprat.max || "?"}`);
   if (state.spratPosebno.size) lines.push(`   Posebno prihvata: ${[...state.spratPosebno].join(", ")}`);
-  if (state.lift) lines.push(`🛗 Lift: ${state.lift}${state.liftMaxSprat ? " (bez lifta do sprata " + state.liftMaxSprat + ")" : ""}`);
-  if (state.terasa) lines.push(`🌿 Terasa: ${state.terasa}`);
+  if (state.lift.size) lines.push(`🛗 Lift: ${[...state.lift].join(", ")}${state.liftMaxSprat ? " (bez lifta do sprata " + state.liftMaxSprat + ")" : ""}`);
+  if (state.terasa.size) lines.push(`🌿 Terasa: ${[...state.terasa].join(", ")}`);
   if (state.grejanje.size) lines.push(`🔥 Grejanje: ${[...state.grejanje].join(", ")}`);
   if (state.stanje.size) lines.push(`🛠️ Stanje stana: ${[...state.stanje].join(", ")}`);
   if (state.zgrada.size) lines.push(`🏗️ Zgrada: ${[...state.zgrada].join(", ")}`);
   if (state.orijentacija.size) lines.push(`🧭 Orijentacija: ${[...state.orijentacija].join(", ")}`);
-  if (state.osvetljenost) lines.push(`☀️ Osvetljenost: ${state.osvetljenost}`);
-  if (state.orijentisanost) lines.push(`🔲 Orijentisanost: ${state.orijentisanost}`);
+  if (state.osvetljenost.size) lines.push(`☀️ Osvetljenost: ${[...state.osvetljenost].join(", ")}`);
+  if (state.orijentisanost.size) lines.push(`🔲 Orijentisanost: ${[...state.orijentisanost].join(", ")}`);
   if (state.parking.size) lines.push(`🚗 Parking: ${[...state.parking].join(", ")}`);
   if (state.ostave.size) lines.push(`📦 Ostave: ${[...state.ostave].join(", ")}`);
-  if (state.dokumentacija) lines.push(`📑 Dokumentacija: ${state.dokumentacija}`);
+  if (state.dokumentacija.size) lines.push(`📑 Dokumentacija: ${[...state.dokumentacija].join(", ")}`);
   if (state.sadrzaji.size) lines.push(`🏘️ Sadržaji u blizini: ${[...state.sadrzaji].join(", ")}`);
-  if (state.prioriteti.size) lines.push(`⭐ Prioriteti: ${[...state.prioriteti].join(", ")}`);
+  if (state.prioriteti.size) lines.push(`Prioriteti: ${[...state.prioriteti].join(", ")}`);
   if (state.dodatno) lines.push(`📝 Dodatno: ${state.dodatno}`);
 
   lines.push("");
   lines.push("— Dodatna pitanja —");
-  if (state.prodajeStan) lines.push(`Prodaje stan pre kupovine: ${state.prodajeStan}`);
-  if (state.kadaKupovina) lines.push(`Planirana kupovina: ${state.kadaKupovina}`);
-  if (state.vlasnikOglasi) lines.push(`Samo oglasi vlasnika: ${state.vlasnikOglasi}`);
-  if (state.agencijskiOglasi) lines.push(`Prihvata agencijske oglase: ${state.agencijskiOglasi}`);
-  if (state.odstupanjeCena) lines.push(`Odstupanje od cene: ${state.odstupanjeCena}`);
-  if (state.odstupanjeKvadratura) lines.push(`Odstupanje od kvadrature: ${state.odstupanjeKvadratura}`);
-  if (state.adaptacija) lines.push(`Prihvata adaptaciju: ${state.adaptacija}`);
-  if (state.potkrovlje) lines.push(`Prihvata potkrovlje: ${state.potkrovlje}`);
-  if (state.bezTerase) lines.push(`Prihvata bez terase: ${state.bezTerase}`);
-  if (state.odmahUseljiv) lines.push(`Odmah useljiv: ${state.odmahUseljiv}`);
-  if (state.energetska) lines.push(`Energetska efikasnost bitna: ${state.energetska}`);
-  if (state.ljubimci) lines.push(`Kućni ljubimci bitni: ${state.ljubimci}`);
-  if (state.ulica) lines.push(`Ulica: ${state.ulica}`);
-  if (state.pogled2) lines.push(`Pogled na park/reku/grad: ${state.pogled2}`);
+  if (state.prodajeStan.size) lines.push(`Prodaje stan pre kupovine: ${[...state.prodajeStan].join(", ")}`);
+  if (state.kadaKupovina.size) lines.push(`Planirana kupovina: ${[...state.kadaKupovina].join(", ")}`);
+  if (state.adaptacija.size) lines.push(`Prihvata adaptaciju: ${[...state.adaptacija].join(", ")}`);
+  if (state.potkrovlje.size) lines.push(`Prihvata potkrovlje: ${[...state.potkrovlje].join(", ")}`);
+  if (state.bezTerase.size) lines.push(`Prihvata bez terase: ${[...state.bezTerase].join(", ")}`);
+  if (state.odmahUseljiv.size) lines.push(`Odmah useljiv: ${[...state.odmahUseljiv].join(", ")}`);
+  if (state.ljubimci.size) lines.push(`Kućni ljubimci bitni: ${[...state.ljubimci].join(", ")}`);
+  if (state.ulica.size) lines.push(`Ulica: ${[...state.ulica].join(", ")}`);
+  if (state.pogled2.size) lines.push(`Pogled na park/reku/grad: ${[...state.pogled2].join(", ")}`);
   if (state.minutiPrevoz) lines.push(`Minuta peške do prevoza: ${state.minutiPrevoz}`);
   if (state.minutiSkola) lines.push(`Minuta peške do škole/vrtića: ${state.minutiSkola}`);
   if (state.video.size) lines.push(`Zgrada: ${[...state.video].join(", ")}`);
@@ -878,15 +851,34 @@ function closeModal() {
 }
 
 /* ====== PODESI OVDE broj telefona i email agencije ====== */
-const AGENCIJA_WHATSAPP_BROJ = ""; // npr. "381601234567" (bez + i bez razmaka) - ostavi prazno da korisnik sam bira kontakt
+const AGENCIJA_WHATSAPP_BROJ = "381641180879"; // bez + i bez razmaka
 const AGENCIJA_EMAIL = "stanzasvakidan@gmail.com";
 
 function sendWhatsApp() {
   const text = encodeURIComponent(buildSummaryText());
-  const url = AGENCIJA_WHATSAPP_BROJ
-    ? `https://wa.me/${AGENCIJA_WHATSAPP_BROJ}?text=${text}`
-    : `https://wa.me/?text=${text}`;
+  const url = `https://wa.me/${AGENCIJA_WHATSAPP_BROJ}?text=${text}`;
   window.open(url, '_blank');
+}
+
+function sendViber() {
+  const text = encodeURIComponent(buildSummaryText());
+  // Viber nema mogućnost da direktno otvori chat sa brojem i unapred upisanim tekstom
+  // kao WhatsApp, pa se otvara Viber-ov ekran za deljenje gde korisnik sam bira kontakt.
+  window.location.href = `viber://forward?text=${text}`;
+  setTimeout(() => {
+    document.getElementById('sendStatus').style.color = "#9c9890";
+    document.getElementById('sendStatus').textContent = "Ako se Viber nije otvorio, aplikacija verovatno nije instalirana na ovom uređaju.";
+  }, 800);
+}
+
+function sendSMS() {
+  const text = encodeURIComponent(buildSummaryText());
+  // Format se razlikuje po uređaju (iOS koristi &body=, Android obično ?body=)
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const url = isIOS
+    ? `sms:${AGENCIJA_WHATSAPP_BROJ}&body=${text}`
+    : `sms:${AGENCIJA_WHATSAPP_BROJ}?body=${text}`;
+  window.location.href = url;
 }
 
 function sendFormSubmit() {
