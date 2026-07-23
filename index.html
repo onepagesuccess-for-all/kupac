@@ -372,7 +372,7 @@
       <button class="btn btn-secondary" onclick="copyText()">Kopiraj tekst</button>
     </div>
     <p id="sendStatus" style="font-size:0.8rem;color:#9c9890;margin-top:10px;"></p>
-    <p style="font-size:0.76rem;color:#8a8579;margin-top:4px;">WhatsApp radi ako kupac ima bilo kakav WhatsApp nalog (telefon ili web). Viber i SMS automatski kopiraju ceo tekst — samo ga nalepite (dugi pritisak → Nalepi) kad se aplikacija otvori.</p>
+    <p style="font-size:0.76rem;color:#8a8579;margin-top:4px;">WhatsApp radi ako kupac ima bilo kakav WhatsApp nalog (telefon ili web). Viber automatski kopira ceo tekst — samo ga nalepite (dugi pritisak → Nalepi) kad se aplikacija otvori.</p>
   </div>
 </div>
 
@@ -878,16 +878,13 @@ function sendViber() {
 }
 
 function sendSMS() {
-  copyFullTextSilently();
-  const shortMsg = "Profil željene nekretnine je kopiran - nalepite ga ovde (dugi pritisak -> Nalepi).";
+  const text = encodeURIComponent(buildSummaryText());
+  // Format se razlikuje po uređaju (iOS koristi &body=, Android obično ?body=)
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const url = isIOS
-    ? `sms:${AGENCIJA_WHATSAPP_BROJ}&body=${encodeURIComponent(shortMsg)}`
-    : `sms:${AGENCIJA_WHATSAPP_BROJ}?body=${encodeURIComponent(shortMsg)}`;
+    ? `sms:${AGENCIJA_WHATSAPP_BROJ}&body=${text}`
+    : `sms:${AGENCIJA_WHATSAPP_BROJ}?body=${text}`;
   window.location.href = url;
-  const statusEl = document.getElementById('sendStatus');
-  statusEl.style.color = "#9c9890";
-  statusEl.textContent = "Kompletan profil je kopiran. Kad se SMS aplikacija otvori, dugo pritisnite polje za poruku i izaberite Nalepi.";
 }
 
 function sendFormSubmit() {
