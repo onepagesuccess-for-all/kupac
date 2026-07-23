@@ -437,7 +437,11 @@ const state = {
   minutiPrevoz: "",
   minutiSkola: "",
   pogled2: new Set(),
-  video: new Set()
+  video: new Set(),
+  ime: "",
+  telefon1: "",
+  telefon2: "",
+  email: ""
 };
 
 const PRIORITETI_LISTA = ["Lokacija","Cena","Kvadratura","Uknjiženost","Lift","Terasa","Parking","Garaža","Miran kraj","Škole","Prevoz","Novogradnja","Starogradnja","Luksuz","Svetao stan","Pogled","Dobra investicija"];
@@ -746,13 +750,58 @@ root.appendChild(makeSection(22, "Dodatna pitanja (opciono)", (body) => {
   buildMultiSection(body, ["Video-nadzor","Interfon","Nije bitno"], state.video);
 }));
 
+root.appendChild(makeSection(23, "Vaši podaci", (body) => {
+  const note = el('div', 'priority-note', 'Ostavite ime i (opciono) kontakt, da vas brže obavestimo kad se pojavi odgovarajuća ponuda.');
+  body.appendChild(note);
+
+  const nameLabel = el('label', 'field-label', 'Ime i prezime');
+  body.appendChild(nameLabel);
+  const nameInput = el('input');
+  nameInput.type = 'text';
+  nameInput.placeholder = 'npr. Marko Marković';
+  nameInput.oninput = () => { state.ime = nameInput.value; updateProgress(); };
+  body.appendChild(nameInput);
+
+  const grid = el('div', 'grid-2');
+  grid.style.marginTop = "12px";
+
+  const w1 = el('div');
+  w1.innerHTML = `<label class="field-label">Telefon 1 (opciono)</label>`;
+  const i1 = el('input');
+  i1.type = 'tel';
+  i1.placeholder = 'npr. 06X XXX XXXX';
+  i1.oninput = () => { state.telefon1 = i1.value; updateProgress(); };
+  w1.appendChild(i1);
+
+  const w2 = el('div');
+  w2.innerHTML = `<label class="field-label">Telefon 2 (opciono)</label>`;
+  const i2 = el('input');
+  i2.type = 'tel';
+  i2.placeholder = 'npr. 06X XXX XXXX';
+  i2.oninput = () => { state.telefon2 = i2.value; updateProgress(); };
+  w2.appendChild(i2);
+
+  grid.appendChild(w1);
+  grid.appendChild(w2);
+  body.appendChild(grid);
+
+  const emailLabel = el('label', 'field-label', 'Email (opciono)');
+  emailLabel.style.marginTop = "12px";
+  body.appendChild(emailLabel);
+  const emailInput = el('input');
+  emailInput.type = 'email';
+  emailInput.placeholder = 'npr. ime@email.com';
+  emailInput.oninput = () => { state.email = emailInput.value; updateProgress(); };
+  body.appendChild(emailInput);
+}));
+
 /* otvori prvu sekciju odmah */
 root.querySelector('.section').classList.add('open');
 
 /* ====================== PROGRESS ====================== */
 
 function countAnswered() {
-  let answered = 0, total = 22;
+  let answered = 0, total = 23;
   if (Object.keys(state.opstine).some(k => state.opstine[k].size > 0)) answered++;
   if (state.tip.size > 0) answered++;
   if (state.povrsinaMin || state.povrsinaMax) answered++;
@@ -775,6 +824,7 @@ function countAnswered() {
   if (state.prioriteti.size > 0) answered++;
   if (state.dodatno) answered++;
   if (state.prodajeStan.size > 0 || state.kadaKupovina.size > 0) answered++;
+  if (state.ime || state.telefon1 || state.telefon2 || state.email) answered++;
   return { answered, total };
 }
 
@@ -791,6 +841,14 @@ function buildSummaryText() {
   const lines = [];
   lines.push("📋 PROFIL ŽELJENE NEKRETNINE");
   lines.push("");
+
+  if (state.ime || state.telefon1 || state.telefon2 || state.email) {
+    if (state.ime) lines.push(`👤 Ime: ${state.ime}`);
+    if (state.telefon1) lines.push(`📞 Telefon 1: ${state.telefon1}`);
+    if (state.telefon2) lines.push(`📞 Telefon 2: ${state.telefon2}`);
+    if (state.email) lines.push(`✉️ Email: ${state.email}`);
+    lines.push("");
+  }
 
   const opstineList = Object.keys(state.opstine).filter(k => state.opstine[k].size > 0);
   if (opstineList.length) {
