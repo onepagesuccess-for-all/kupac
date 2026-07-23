@@ -7,7 +7,8 @@
 <title>Profil željene nekretnine</title>
 <meta property="og:title" content="Profil željene nekretnine">
 <meta property="og:description" content="Molim Vas popunite za 2–3 minuta — pomoći ćete nam da Vam brzo pronađemo odgovarajući stan!">
-<meta property="og:image" content="https://ONDESITE.KOJIKORISTIS/preview.jpg">
+<meta property="og:image" content="https://onepagesuccess-for-all.github.io/kupac/preview.jpg">
+<meta property="og:url" content="https://onepagesuccess-for-all.github.io/kupac/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -371,7 +372,7 @@
       <button class="btn btn-secondary" onclick="copyText()">Kopiraj tekst</button>
     </div>
     <p id="sendStatus" style="font-size:0.8rem;color:#9c9890;margin-top:10px;"></p>
-    <p style="font-size:0.76rem;color:#8a8579;margin-top:4px;">Ne morate imati instaliran WhatsApp da biste poslali poruku! Za Viber je potrebna instalirana aplikacija na telefonu.</p>
+    <p style="font-size:0.76rem;color:#8a8579;margin-top:4px;">WhatsApp radi ako kupac ima bilo kakav WhatsApp nalog (telefon ili web). Viber i SMS automatski kopiraju ceo tekst — samo ga nalepite (dugi pritisak → Nalepi) kad se aplikacija otvori.</p>
   </div>
 </div>
 
@@ -860,25 +861,33 @@ function sendWhatsApp() {
   window.open(url, '_blank');
 }
 
+function copyFullTextSilently() {
+  const fullText = buildSummaryText();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullText).catch(() => {});
+  }
+}
+
 function sendViber() {
-  const text = encodeURIComponent(buildSummaryText());
-  // Viber nema mogućnost da direktno otvori chat sa brojem i unapred upisanim tekstom
-  // kao WhatsApp, pa se otvara Viber-ov ekran za deljenje gde korisnik sam bira kontakt.
-  window.location.href = `viber://forward?text=${text}`;
-  setTimeout(() => {
-    document.getElementById('sendStatus').style.color = "#9c9890";
-    document.getElementById('sendStatus').textContent = "Ako se Viber nije otvorio, aplikacija verovatno nije instalirana na ovom uređaju.";
-  }, 800);
+  copyFullTextSilently();
+  const shortMsg = "📋 Šaljem Vam profil željene nekretnine. Kompletan tekst je kopiran — molim nalepite ga ovde (dugi pritisak na polje za poruku → Nalepi).";
+  window.location.href = `viber://forward?text=${encodeURIComponent(shortMsg)}`;
+  const statusEl = document.getElementById('sendStatus');
+  statusEl.style.color = "#9c9890";
+  statusEl.textContent = "Kompletan profil je kopiran. Kad se Viber otvori, dugo pritisnite polje za poruku i izaberite Nalepi.";
 }
 
 function sendSMS() {
-  const text = encodeURIComponent(buildSummaryText());
-  // Format se razlikuje po uređaju (iOS koristi &body=, Android obično ?body=)
+  copyFullTextSilently();
+  const shortMsg = "Profil željene nekretnine je kopiran - nalepite ga ovde (dugi pritisak -> Nalepi).";
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const url = isIOS
-    ? `sms:${AGENCIJA_WHATSAPP_BROJ}&body=${text}`
-    : `sms:${AGENCIJA_WHATSAPP_BROJ}?body=${text}`;
+    ? `sms:${AGENCIJA_WHATSAPP_BROJ}&body=${encodeURIComponent(shortMsg)}`
+    : `sms:${AGENCIJA_WHATSAPP_BROJ}?body=${encodeURIComponent(shortMsg)}`;
   window.location.href = url;
+  const statusEl = document.getElementById('sendStatus');
+  statusEl.style.color = "#9c9890";
+  statusEl.textContent = "Kompletan profil je kopiran. Kad se SMS aplikacija otvori, dugo pritisnite polje za poruku i izaberite Nalepi.";
 }
 
 function sendFormSubmit() {
