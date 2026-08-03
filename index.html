@@ -935,7 +935,7 @@ function copyFullTextSilently() {
 
 function sendViber() {
   copyFullTextSilently();
-  const shortMsg = "📋 Šaljem Vam profil željene nekretnine. Kompletan tekst je kopiran — molim nalepite ga ovde (dugi pritisak na polje za poruku → Nalepi).";
+  const shortMsg = "📋 Šaljem Vam profil željenog stana. Kompletan tekst je kopiran — molim nalepite ga ovde (dugi pritisak na polje za poruku → Nalepi).";
   window.location.href = `viber://forward?text=${encodeURIComponent(shortMsg)}`;
   const statusEl = document.getElementById('sendStatus');
   statusEl.style.color = "#9c9890";
@@ -967,7 +967,7 @@ function sendFormSubmit() {
       'Accept': 'application/json'
     },
     body: JSON.stringify({
-      _subject: "Novi profil željene nekretnine",
+      _subject: "Novi profil željenog stana",
       poruka: text
     })
   })
