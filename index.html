@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Profil željene nekretnine</title>
 <meta property="og:title" content="Profil željene nekretnine">
-<meta property="og:description" content="Molim Vas popunite za 2–3 minuta — pomoći ćete nam da Vam brzo pronađemo odgovarajući stan!">
+<meta property="og:description" content="Molim Vas popunite upitnik. Neće trajati duže od 2–3 minuta, a nama ćete pomoći da Vam brzo pronađemo odgovarajući stan!">
 <meta property="og:image" content="https://onepagesuccess-for-all.github.io/kupac/preview.jpg">
 <meta property="og:url" content="https://onepagesuccess-for-all.github.io/kupac/">
 <meta property="og:type" content="website">
@@ -338,7 +338,7 @@
 
 <header>
   <h1>Profil željene nekretnine</h1>
-  <p>Molim Vas popunite za 2–3 minuta — pomoći ćete nam da Vam brzo pronađemo odgovarajući stan!</p>
+  <p>Molim Vas popunite upitnik. Neće trajati duže od 2–3 minuta, a nama ćete pomoći da Vam brzo pronađemo odgovarajući stan!</p>
 </header>
 
 <div class="progress-wrap">
@@ -744,10 +744,10 @@ root.appendChild(makeSection(22, "Dodatna pitanja (opciono)", (body) => {
   grid.appendChild(w1); grid.appendChild(w2);
   body.appendChild(grid);
 
-  const label3 = el('label', 'field-label', 'Da li želite zgradu sa video-nadzorom / interfonom / recepcijom?');
+  const label3 = el('label', 'field-label', 'Koje sisteme bezbednosti zgrade želite?');
   label3.style.marginTop = "12px";
   body.appendChild(label3);
-  buildMultiSection(body, ["Video-nadzor","Interfon","Nije bitno"], state.video);
+  buildMultiSection(body, ["Video nadzor","Interfon","Video-interfon","Kontrolisan pristup (RFID tag/kartica ili PIN kod)","Fizičko obezbeđenje (24/7)","Ograđen kompleks","Nije važno"], state.video);
 }));
 
 root.appendChild(makeSection(23, "Vaši podaci", (body) => {
