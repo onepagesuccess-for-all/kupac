@@ -438,6 +438,7 @@ const state = {
   minutiSkola: "",
   pogled2: new Set(),
   video: new Set(),
+  tipGradnje: new Set(),
   ime: "",
   telefon1: "",
   telefon2: "",
@@ -609,7 +610,7 @@ const root = document.getElementById('formRoot');
 
 root.appendChild(makeSection(1, "Lokacija", buildLokacija));
 
-root.appendChild(makeSection(2, "Tip nekretnine", (body) => {
+root.appendChild(makeSection(2, "Struktura stana", (body) => {
   buildMultiSection(body, ["Garsonjera","Jednosoban","Jednoiposoban","Dvosoban","Dvoiposoban","Trosoban","Troiposoban","Četvorosoban","Veći stan","Duplex","Penthouse"], state.tip);
 }));
 
@@ -661,56 +662,60 @@ root.appendChild(makeSection(10, "Grejanje", (body) => {
   buildMultiSection(body, ["Centralno","CG po potrošnji","Gas","Etažno","Toplotna pumpa","TA peć","Inverter klima","Nije bitno"], state.grejanje);
 }));
 
-root.appendChild(makeSection(11, "Stanje stana", (body) => {
-  buildMultiSection(body, ["Očuvan","Za renoviranje","Delimično renoviran","Renoviran","Luksuzno sređen","Novogradnja","Starogradnja"], state.stanje);
+root.appendChild(makeSection(11, "Stanje", (body) => {
+  buildMultiSection(body, ["Očuvan","Za renoviranje","Delimično renoviran","Renoviran","Luksuzno sređen"], state.stanje);
 }));
 
-root.appendChild(makeSection(12, "Zgrada", (body) => {
+root.appendChild(makeSection(12, "Tip gradnje", (body) => {
+  buildMultiSection(body, ["Novogradnja","Starogradnja"], state.tipGradnje);
+}));
+
+root.appendChild(makeSection(13, "Zgrada", (body) => {
   buildMultiSection(body, ["Mala zgrada","Do 3 sprata","Do 5 spratova","Višespratnica","Novija gradnja","Stara gradnja","Nije bitno"], state.zgrada);
 }));
 
-root.appendChild(makeSection(13, "Orijentacija", (body) => {
+root.appendChild(makeSection(14, "Orijentacija", (body) => {
   buildMultiSection(body, ["Istok","Zapad","Sever","Jug","Jugoistok","Jugozapad","Severoistok","Severozapad","Nije bitno"], state.orijentacija);
 }));
 
-root.appendChild(makeSection(14, "Osvetljenost", (body) => {
+root.appendChild(makeSection(15, "Osvetljenost", (body) => {
   buildSingleSection(body, ["Veoma svetao","Svetao","Nije bitno"], state, "osvetljenost");
 }));
 
-root.appendChild(makeSection(15, "Orijentisanost", (body) => {
+root.appendChild(makeSection(16, "Orijentisanost", (body) => {
   buildSingleSection(body, ["Jednostrano","Dvostrano","Trostrano","Četvorostrano","Nije bitno"], state, "orijentisanost");
 }));
 
-root.appendChild(makeSection(16, "Parking", (body) => {
+root.appendChild(makeSection(17, "Parking", (body) => {
   buildMultiSection(body, ["Garaža","Garažno mesto","Parking mesto","Slobodan parking","Nije bitno"], state.parking);
 }));
 
-root.appendChild(makeSection(17, "Ostave", (body) => {
+root.appendChild(makeSection(18, "Ostave", (body) => {
   buildMultiSection(body, ["Podrum","Ostava","Tavanski prostor","Nije bitno"], state.ostave);
 }));
 
-root.appendChild(makeSection(18, "Dokumentacija", (body) => {
+root.appendChild(makeSection(19, "Dokumentacija", (body) => {
   buildSingleSection(body, ["Bez tereta","Hipoteka nije problem","Samo čisti papiri"], state, "dokumentacija");
 }));
 
-root.appendChild(makeSection(19, "Sadržaji u blizini", (body) => {
+root.appendChild(makeSection(20, "Sadržaji u blizini", (body) => {
   buildMultiSection(body, ["Vrtić","Škola","Dom zdravlja","Bolnica","Autobus","Tramvaj","Voz","Park","Igralište","Supermarket","Tržni centar","Pijaca","Teretana","Bazen","Šetalište","Rekreacija","Restorani","Kafići"], state.sadrzaji);
 }));
 
-root.appendChild(makeSection(20, "Šta je najvažnije", (body) => {
+root.appendChild(makeSection(21, "Šta je najvažnije", (body) => {
   const note = el('div', 'priority-note', 'Izaberite koliko god želite.');
   body.appendChild(note);
   buildMultiSection(body, PRIORITETI_LISTA.map(p => "⭐ " + p), state.prioriteti);
 }));
 
-root.appendChild(makeSection(21, "Dodatni zahtevi", (body) => {
+root.appendChild(makeSection(22, "Dodatni zahtevi", (body) => {
   const ta = el('textarea');
   ta.placeholder = 'npr. "Obavezno bez buke", "Ne prizemlje", "Po mogućstvu pogled na park"...';
   ta.oninput = () => { state.dodatno = ta.value; updateProgress(); };
   body.appendChild(ta);
 }));
 
-root.appendChild(makeSection(22, "Dodatna pitanja (opciono)", (body) => {
+root.appendChild(makeSection(23, "Dodatna pitanja (opciono)", (body) => {
   const rows = [
     ["Da li prodajete svoj stan pre kupovine?", ["Da","Ne","Nije bitno"], state, "prodajeStan"],
     ["Kada planirate kupovinu?", ["Odmah","Do 30 dana","Do 3 meseca","Do 6 meseci","Nije hitno"], state, "kadaKupovina"],
@@ -750,7 +755,7 @@ root.appendChild(makeSection(22, "Dodatna pitanja (opciono)", (body) => {
   buildMultiSection(body, ["Video nadzor","Interfon","Video-interfon","Kontrolisan pristup (RFID tag/kartica ili PIN kod)","Fizičko obezbeđenje (24/7)","Ograđen kompleks","Nije važno"], state.video);
 }));
 
-root.appendChild(makeSection(23, "Vaši podaci", (body) => {
+root.appendChild(makeSection(24, "Vaši podaci", (body) => {
   const note = el('div', 'priority-note', 'Ostavite ime i (opciono) kontakt, da vas brže obavestimo kad se pojavi odgovarajuća ponuda.');
   body.appendChild(note);
 
@@ -801,7 +806,7 @@ root.querySelector('.section').classList.add('open');
 /* ====================== PROGRESS ====================== */
 
 function countAnswered() {
-  let answered = 0, total = 23;
+  let answered = 0, total = 24;
   if (Object.keys(state.opstine).some(k => state.opstine[k].size > 0)) answered++;
   if (state.tip.size > 0) answered++;
   if (state.povrsinaMin || state.povrsinaMax) answered++;
@@ -813,6 +818,7 @@ function countAnswered() {
   if (state.terasa.size > 0) answered++;
   if (state.grejanje.size > 0) answered++;
   if (state.stanje.size > 0) answered++;
+  if (state.tipGradnje.size > 0) answered++;
   if (state.zgrada.size > 0) answered++;
   if (state.orijentacija.size > 0) answered++;
   if (state.osvetljenost.size > 0) answered++;
@@ -870,7 +876,8 @@ function buildSummaryText() {
   if (state.lift.size) lines.push(`🛗 Lift: ${[...state.lift].join(", ")}${state.liftMaxSprat ? " (bez lifta do sprata " + state.liftMaxSprat + ")" : ""}`);
   if (state.terasa.size) lines.push(`🌿 Terasa: ${[...state.terasa].join(", ")}`);
   if (state.grejanje.size) lines.push(`🔥 Grejanje: ${[...state.grejanje].join(", ")}`);
-  if (state.stanje.size) lines.push(`🛠️ Stanje stana: ${[...state.stanje].join(", ")}`);
+  if (state.stanje.size) lines.push(`🛠️ Stanje: ${[...state.stanje].join(", ")}`);
+  if (state.tipGradnje.size) lines.push(`🏗️ Tip gradnje: ${[...state.tipGradnje].join(", ")}`);
   if (state.zgrada.size) lines.push(`🏗️ Zgrada: ${[...state.zgrada].join(", ")}`);
   if (state.orijentacija.size) lines.push(`🧭 Orijentacija: ${[...state.orijentacija].join(", ")}`);
   if (state.osvetljenost.size) lines.push(`☀️ Osvetljenost: ${[...state.osvetljenost].join(", ")}`);
