@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Profil željene nekretnine</title>
 <meta property="og:title" content="Profil željene nekretnine">
-<meta property="og:description" content="Molim Vas popunite upitnik. Neće trajati duže od 2–3 minuta, a nama ćete pomoći da Vam brzo pronađemo odgovarajući stan!">
+<meta property="og:description" content="Molim Vas popunite upitnik. Trajaće najduže 2–3 minuta, a nama ćete time pomoći da Vam brzo pronađemo odgovarajući stan. Hvala Vam 😊">
 <meta property="og:image" content="https://onepagesuccess-for-all.github.io/kupac/preview.jpg">
 <meta property="og:url" content="https://onepagesuccess-for-all.github.io/kupac/">
 <meta property="og:type" content="website">
@@ -338,7 +338,7 @@
 
 <header>
   <h1>Profil željene nekretnine</h1>
-  <p>Molim Vas popunite upitnik. Neće trajati duže od 2–3 minuta, a nama ćete pomoći da Vam brzo pronađemo odgovarajući stan!</p>
+  <p>Molim Vas popunite upitnik. Trajaće najduže 2–3 minuta, a nama ćete time pomoći da Vam brzo pronađemo odgovarajući stan. Hvala Vam 😊</p>
 </header>
 
 <div class="progress-wrap">
@@ -639,7 +639,7 @@ root.appendChild(makeSection(7, "Sprat", (body) => {
   const label = el('label', 'field-label', 'Posebno prihvata:');
   label.style.marginTop = "12px";
   body.appendChild(label);
-  buildMultiSection(body, ["Prizemlje","Visoko prizemlje","Suteren","Potkrovlje","Poslednji sprat"], state.spratPosebno);
+  buildMultiSection(body, ["Suteren","Prizemlje","Visoko prizemlje","Potkrovlje","Poslednji sprat"], state.spratPosebno);
 }));
 
 root.appendChild(makeSection(8, "Lift", (body) => {
@@ -663,7 +663,7 @@ root.appendChild(makeSection(10, "Grejanje", (body) => {
 }));
 
 root.appendChild(makeSection(11, "Stanje", (body) => {
-  buildMultiSection(body, ["Očuvan","Za renoviranje","Delimično renoviran","Renoviran","Luksuzno sređen"], state.stanje);
+  buildMultiSection(body, ["Za renoviranje","Očuvan","Delimično renoviran","Renoviran","Lux"], state.stanje);
 }));
 
 root.appendChild(makeSection(12, "Tip gradnje", (body) => {
@@ -671,10 +671,10 @@ root.appendChild(makeSection(12, "Tip gradnje", (body) => {
 }));
 
 root.appendChild(makeSection(13, "Zgrada", (body) => {
-  buildMultiSection(body, ["Mala zgrada","Do 3 sprata","Do 5 spratova","Višespratnica","Novija gradnja","Stara gradnja","Nije bitno"], state.zgrada);
+  buildMultiSection(body, ["Mala zgrada","Do 3 sprata","Do 5 spratova","Višespratnica","Nije bitno"], state.zgrada);
 }));
 
-root.appendChild(makeSection(14, "Orijentacija", (body) => {
+root.appendChild(makeSection(14, "Geografska orijentacija", (body) => {
   buildMultiSection(body, ["Istok","Zapad","Sever","Jug","Jugoistok","Jugozapad","Severoistok","Severozapad","Nije bitno"], state.orijentacija);
 }));
 
@@ -682,7 +682,7 @@ root.appendChild(makeSection(15, "Osvetljenost", (body) => {
   buildSingleSection(body, ["Veoma svetao","Svetao","Nije bitno"], state, "osvetljenost");
 }));
 
-root.appendChild(makeSection(16, "Orijentisanost", (body) => {
+root.appendChild(makeSection(16, "Orijentacija", (body) => {
   buildSingleSection(body, ["Jednostrano","Dvostrano","Trostrano","Četvorostrano","Nije bitno"], state, "orijentisanost");
 }));
 
@@ -724,7 +724,7 @@ root.appendChild(makeSection(23, "Dodatna pitanja (opciono)", (body) => {
     ["Da li prihvatate stan bez terase ako ispunjava sve ostalo?", ["Da","Ne"], state, "bezTerase"],
     ["Da li želite odmah useljiv stan?", ["Da","Ne","Svejedno"], state, "odmahUseljiv"],
     ["Da li su kućni ljubimci bitni (dvorište/park)?", ["Da","Ne","Svejedno"], state, "ljubimci"],
-    ["Da li želite mirnu ulicu ili bučni centar?", ["Mirna ulica","Bučni centar","Svejedno"], state, "ulica"],
+    ["Da li želite mirnu ulicu ili gradsku vrevu?", ["Mirnu ulicu","Gradsku vrevu","Nešto između","Svejedno"], state, "ulica"],
     ["Da li želite pogled na park/reku/grad?", ["Da","Ne","Svejedno"], state, "pogled2"]
   ];
   rows.forEach(([q, opts, obj, key]) => {
@@ -756,10 +756,10 @@ root.appendChild(makeSection(23, "Dodatna pitanja (opciono)", (body) => {
 }));
 
 root.appendChild(makeSection(24, "Vaši podaci", (body) => {
-  const note = el('div', 'priority-note', 'Ostavite ime i (opciono) kontakt, da vas brže obavestimo kad se pojavi odgovarajuća ponuda.');
+  const note = el('div', 'priority-note', 'Ostavite ime i (opciono) kontakt, da Vas brže obavestimo kad se pojavi odgovarajuća ponuda.');
   body.appendChild(note);
 
-  const nameLabel = el('label', 'field-label', 'Ime i prezime');
+  const nameLabel = el('label', 'field-label', 'Ime (i prezime)');
   body.appendChild(nameLabel);
   const nameInput = el('input');
   nameInput.type = 'text';
@@ -879,9 +879,9 @@ function buildSummaryText() {
   if (state.stanje.size) lines.push(`🛠️ Stanje: ${[...state.stanje].join(", ")}`);
   if (state.tipGradnje.size) lines.push(`🏗️ Tip gradnje: ${[...state.tipGradnje].join(", ")}`);
   if (state.zgrada.size) lines.push(`🏗️ Zgrada: ${[...state.zgrada].join(", ")}`);
-  if (state.orijentacija.size) lines.push(`🧭 Orijentacija: ${[...state.orijentacija].join(", ")}`);
+  if (state.orijentacija.size) lines.push(`🧭 Geografska orijentacija: ${[...state.orijentacija].join(", ")}`);
   if (state.osvetljenost.size) lines.push(`☀️ Osvetljenost: ${[...state.osvetljenost].join(", ")}`);
-  if (state.orijentisanost.size) lines.push(`🔲 Orijentisanost: ${[...state.orijentisanost].join(", ")}`);
+  if (state.orijentisanost.size) lines.push(`🔲 Orijentacija: ${[...state.orijentisanost].join(", ")}`);
   if (state.parking.size) lines.push(`🚗 Parking: ${[...state.parking].join(", ")}`);
   if (state.ostave.size) lines.push(`📦 Ostave: ${[...state.ostave].join(", ")}`);
   if (state.dokumentacija.size) lines.push(`📑 Dokumentacija: ${[...state.dokumentacija].join(", ")}`);
